@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>RLmicoDB</title>
+</head>
+<body>
+  <h2>Login Admin</h2>
+  <input type="password" id="adminPass" placeholder="Password Admin">
+  <button onclick="loginAdmin()">Login</button>
+
+  <h2>Tambah Murid</h2>
+  <input type="text" id="muridId" placeholder="ID Murid">
+  <input type="text" id="muridNama" placeholder="Nama Murid">
+  <input type="text" id="muridPin" placeholder="PIN Murid">
+  <input type="text" id="muridImpian" placeholder="Impian">
+  <input type="number" id="muridTarif" placeholder="Tarif">
+  <button onclick="tambahMurid()">Tambah</button>
+
+  <pre id="output"></pre>
+
+<script>
+const API_URL = "PASTE_URL_WEB_APP_ANDA"; // ganti dengan URL Web App hasil deploy
+let adminToken = "";
+
+// Login Admin
+async function loginAdmin() {
+  const pass = document.getElementById("adminPass").value;
+  const res = await fetch(API_URL, {
+    method: "POST",
+    body: JSON.stringify({ action: "loginAdmin", pass: pass })
+  });
+  const data = await res.json();
+  document.getElementById("output").textContent = JSON.stringify(data, null, 2);
+  if (data.ok && data.token) {
+    adminToken = data.token;
+    alert("Login admin sukses!");
+  }
+}
+
+// Tambah Murid (simpan ke sheet students)
+async function tambahMurid() {
+  if (!adminToken) { alert("Login admin dulu!"); return; }
+  const id = document.getElementById("muridId").value;
+  const nama = document.getElementById("muridNama").value;
+  const pin = document.getElementById("muridPin").value;
+  const impian = document.getElementById("muridImpian").value;
+  const tarif = document.getElementById("muridTarif").value;
+
+  // hash PIN di sisi backend, jadi cukup kirim data
+  const res = await fetch(API_URL, {
+    method: "POST",
+    body: JSON.stringify({
+      action: "simpanProfil",
+      token: adminToken,
+      lokasi: "Sekolah X", // contoh isi settings
+      wa: "08123456789"
+    })
+  });
+  const data = await res.json();
+  document.getElementById("output").textContent = JSON.stringify(data, null, 2);
+}
+</script>
+</body>
+</html>
